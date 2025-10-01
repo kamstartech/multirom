@@ -516,7 +516,6 @@ void listview_update_keyact_frame(listview *view)
     for(i = 0; i < view->keyact_item_selected && view->items[i]; ++i)
         y += view->item_height(view->items[i]);
 
-    int h = view->item_height(view->items[i]);
     y -= view->pos;
 
     listview_select_item(view, it);

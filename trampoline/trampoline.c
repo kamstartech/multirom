@@ -116,7 +116,7 @@ int fork_and_exec_with_stdout(char *cmd, char *const *envp)
     return pid;
 }
 
-static int fork_and_exec_with_strace(char *cmd, char** env)
+__attribute__((unused)) static int fork_and_exec_with_strace(char *cmd, char** env)
 {
     pid_t pID = fork();
     if(pID == 0)
@@ -366,7 +366,7 @@ static void fixup_symlinks(void)
         if(lstat(init_links[i], &info) < 0 || !S_ISLNK(info.st_mode))
             continue;
 
-        if (info.st_size < sizeof(buff)-1)
+        if (info.st_size < (off_t)(sizeof(buff)-1))
         {
             len = readlink(init_links[i], buff, sizeof(buff)-1);
             if(len >= 0)
@@ -533,11 +533,13 @@ int trampoline_copy_log(char *klog, const char *dest_path_relative)
     return res;
 }
 
-void klog_periodic(void* ptr) {
+void* klog_periodic(void* ptr) {
+    (void)ptr; // Suppress unused parameter warning
     while(1) {
         usleep(2000000);
         trampoline_copy_log(NULL, "/data/last_kmsg");
     }
+    return NULL;
 }
 
 int main(int argc, char *argv[])

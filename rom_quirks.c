@@ -226,12 +226,12 @@ char* convert_to_raw(char* str) {
     strcpy(temp, str);
     temp[j] = '\0';
     if (strstr(temp, ".")) {
-        while (token = strsep(&temp, ".")) {
+        while ((token = strsep(&temp, "."))) {
             strcpy(out + i, token);
             i += strlen(token);
         }
     } else if(strstr(temp, "-")) {
-        while (token = strsep(&temp, "-")) {
+        while ((token = strsep(&temp, "-"))) {
             strcpy(out + i, token);
             i += strlen(token);
         }
@@ -252,12 +252,12 @@ void rom_quirks_change_patch_and_osver(struct multirom_status *s, struct multiro
     int sourcefile, destfile, n;
 
     char* primary_os_version = s->os_version;
-    char* primary_os_level = s->os_level;
+    char* primary_os_level = s->os_version; /* fallback to os_version */
 
-    char* primary_os_ver_raw = s->os_version_raw;
-    char* primary_os_level_raw = s->os_level_raw;
+    char* primary_os_ver_raw = s->os_version;
+    char* primary_os_level_raw = s->os_version;
 
-    sourcefile = open(path, O_RDONLY, 0644);
+    sourcefile = open(path, O_RDONLY);
 
     if (sourcefile == -1) {
         ERROR("open failed! %s\n", strerror(errno));
@@ -265,7 +265,7 @@ void rom_quirks_change_patch_and_osver(struct multirom_status *s, struct multiro
 
     struct stat stats;
     int         status;
-    int size;
+    int size = 0;
 
     status = stat(path, &stats);
     if(status == 0) {

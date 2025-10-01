@@ -139,7 +139,7 @@ static void keyboard_btn_clicked(void *data)
 int keyboard_init_map(struct keyboard *k, const uint32_t *map, const uint32_t *dimen)
 {
     button *btn;
-    int i, idx = 0;
+    int i;
     uint32_t col = 0;
     char buf[2] = { 0 };
     uint8_t code;

@@ -64,7 +64,7 @@ char *readlink_recursive(const char *link);
 void stdio_to_null();
 char *parse_string(char *src);
 uint32_t timespec_diff(struct timespec *f, struct timespec *s);
-inline int64_t timeval_us_diff(struct timeval now, struct timeval prev);
+int64_t timeval_us_diff(struct timeval now, struct timeval prev);
 void emergency_remount_ro(void);
 int create_loop_device(const char *dev_path, const char *img_path, int loop_num, int loop_chmod);
 int mount_image(const char *src, const char *dst, const char *fs, int flags, const void *data);
@@ -73,12 +73,12 @@ void do_reboot(int type);
 int mr_system(const char *shell_fmt, ...);
 char* read_file(char* file);
 
-inline int imin(int a, int b);
-inline int imax(int a, int b);
-inline int iabs(int a);
-inline int in_rect(int x, int y, int rx, int ry, int rw, int rh);
+int imin(int a, int b);
+int imax(int a, int b);
+int iabs(int a);
+int in_rect(int x, int y, int rx, int ry, int rw, int rh);
 
-inline void *mzalloc(size_t size); // alloc and fill with 0s
+void *mzalloc(size_t size);
 char *strtoupper(const char *str);
 int strstartswith(const char *haystack, const char *needle);
 int strendswith(const char *haystack, const char *needle);

@@ -132,7 +132,6 @@ int decompress_second_rd(const char* target, const char *second_path) {
     mkdir(second_unpacked_dir, 0755);
 
     // Decompress initrd
-    int type;
     char buff[256];
     char busybox_path[256];
     snprintf(busybox_path, sizeof(busybox_path), "%s/busybox", mrom_dir());
@@ -178,8 +177,6 @@ int pack_second_rd(const char *second_path, const char* unpacked_dir) {
     } else {
         return 0;
     }
-success:
-    result = 0;
 fail:
     remove_dir(second_unpacked_dir);
     return result;
@@ -224,7 +221,7 @@ int decompress_rd(const char *path, const char* target, int* type) {
     else
     {
         ERROR("Unknown ramdisk magic 0x%08X, can't update trampoline\n", magic);
-        goto success;
+        return 0;
     }
 
     char *cmd[] = { busybox_path, "sh", "-c", buff, NULL };
@@ -248,8 +245,6 @@ int decompress_rd(const char *path, const char* target, int* type) {
     } else {
         return 0;
     }
-success:
-    result = 0;
 fail:
     remove_dir(target);
     return result;
@@ -316,8 +311,6 @@ static int inject_rd(const char *path)
         goto fail;
     }
 
-
-success:
     result = 0;
 fail:
     return result;
@@ -328,13 +321,12 @@ int inject_cmdline(struct bootimg *image)
     int res = 0;
     char* custom_cmdline = "printk.devkmsg=on androidboot.android_dt_dir=/fakefstab/";
 
-    char* cmdline = libbootimg_get_cmdline(&image->hdr);
-    char* newcmdline = NULL;
+    char* cmdline = (char*)image->hdr.cmdline;
     if (!strstr(cmdline, custom_cmdline)) {
-        asprintf(&newcmdline, "%s %s", cmdline, custom_cmdline);
-
-        libbootimg_set_cmdline(&image->hdr, newcmdline);
-        free(newcmdline);
+        char newcmdline[BOOT_ARGS_SIZE];
+        snprintf(newcmdline, BOOT_ARGS_SIZE, "%s %s", cmdline, custom_cmdline);
+        strncpy((char*)image->hdr.cmdline, newcmdline, BOOT_ARGS_SIZE - 1);
+        image->hdr.cmdline[BOOT_ARGS_SIZE - 1] = '\0';
     }
 
     return res;
@@ -347,7 +339,6 @@ int inject_bootimg(const char *img_path, int force)
     int img_ver;
     char initrd_path[256];
     static const char *initrd_tmp_name = "/inject-initrd.img";
-    static const char *initrd2_tmp_name = "/mrom_rd/sbin/ramdisk.cpio";
 
 #ifdef BOARD_BOOTIMAGE_PARTITION_SIZE
     if(access(img_path, F_OK) == 0)

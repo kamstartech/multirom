@@ -583,7 +583,16 @@ static int inject_file_contexts_bin(const char *path)
         //else error
     }
 
-out:
+    goto successful_injection;
+
+noerr:
+    fclose(bin_file_out);
+    fclose(bin_file_in);
+    remove(tmp_name);
+    free(tmp_name);
+    return 0;
+
+successful_injection:
     fclose(bin_file_out);
     fclose(bin_file_in);
     rename(tmp_name, path);
@@ -594,18 +603,6 @@ out:
 #endif
     free(tmp_name);
     return 0;
-noerr:
-    fclose(bin_file_out);
-    fclose(bin_file_in);
-    remove(tmp_name);
-    free(tmp_name);
-    return 0;
-err:
-    fclose(bin_file_out);
-    fclose(bin_file_in);
-    remove(tmp_name);
-    free(tmp_name);
-    return -2;
 }
 /* ************************************************************************************************************************************************ */
 

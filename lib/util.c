@@ -95,7 +95,6 @@ static unsigned int android_name_to_id(const char *name)
 unsigned int decode_uid(const char *s)
 {
     unsigned int v;
-    uid_t uid;
     struct passwd *pwd = NULL;
 
     if (!s || *s == '\0') {
@@ -158,7 +157,7 @@ int mkdir_recursive_with_perms(const char *pathname, mode_t mode, const char *ow
     return 0;
 }
 
-int mkdir_with_perms(const char *path, mode_t mode, const char *owner, const char *group)
+int mkdir_with_perms(const char *path, mode_t mode, const char *owner, UNUSED const char *group)
 {
     int ret;
     struct passwd *pwd = NULL;
@@ -190,7 +189,7 @@ int mkdir_with_perms(const char *path, mode_t mode, const char *owner, const cha
     return 0;
 }
 
-int mkdir_with_perms_context(const char *path, mode_t mode, const char *owner, const char *group, char* context)
+int mkdir_with_perms_context(const char *path, mode_t mode, const char *owner, UNUSED const char *group, char* context)
 {
     int ret;
     struct passwd *pwd = NULL;
@@ -362,11 +361,11 @@ int copy_file_with_context(const char *from, const char *to, char* context)
 int getattr(const char *path, struct file_attr *a) {
 	if (lstat(path, &a->st) == -1)
 		return -1;
-	char con[256];
+	char *con;
 	if (getfilecon(path, &con) == -1)
 		return -1;
 	strcpy(a->con, con);
-	//freecon(con);
+	free(con);
 	return 0;
 }
 
@@ -387,7 +386,6 @@ void clone_dir(DIR* d, char* dirpath, char* target, bool preserve_context, char*
     memset(in, 0, 256);
     memset(out, 0, 256);
     struct dirent *dp = NULL;
-    char *fstab_name = NULL;
     DIR* dir = NULL;
     if (access(target, F_OK)) {
         mkdir_with_perms(target, 0755, NULL, NULL);
@@ -705,7 +703,7 @@ char *readlink_recursive(const char *link)
 
     do
     {
-        if(info.st_size >= sizeof(path)-1)
+        if((size_t)info.st_size >= sizeof(path)-1)
         {
             ERROR("readlink_recursive(): Couldn't resolve, too long path.\n");
             return NULL;

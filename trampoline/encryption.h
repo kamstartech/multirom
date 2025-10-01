@@ -28,7 +28,7 @@ int encryption_before_mount(struct fstab *fstab);
 void encryption_destroy(void);
 int encryption_cleanup(void);
 #else
-int encryption_before_mount(struct fstab *fstab) { return ENC_RES_OK; }
+int encryption_before_mount(struct fstab *fstab) { (void)fstab; return ENC_RES_OK; }
 void encryption_destroy(void) { }
 int encryption_cleanup(void) { return 0; }
 #endif

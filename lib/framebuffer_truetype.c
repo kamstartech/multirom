@@ -121,9 +121,9 @@ static int convert_ft_bitmap(FT_BitmapGlyph bit, px_type color, px_type *res_dat
     if(res_itr < res_data)
         res_itr = res_data;
 
-    for(y = 0; y < bit->bitmap.rows; ++y)
+    for(y = 0; y < (int)bit->bitmap.rows; ++y)
     {
-        for(x = 0; x < bit->bitmap.width; ++x)
+        for(x = 0; x < (int)bit->bitmap.width; ++x)
         {
 #if PIXEL_SIZE == 4
             *res_itr++ = color | (buff[x] << ((PX_IDX_A*8)));
@@ -244,7 +244,6 @@ static void add_to_strings(fb_img *img)
 
 static int unlink_from_caches(text_extra *ex)
 {
-    struct glyphs_entry *en;
     struct strings_entry *sen;
 
     sen = get_cache_for_string(ex);
@@ -337,7 +336,6 @@ static void render_line(struct text_line *line, struct glyphs_entry **gen, int8_
     int i, error;
     FT_Glyph *image;
     FT_BitmapGlyph bit;
-    struct glyphs_entry *en;
 
     for(i = 0; i < line->len; ++i, ++style_map)
     {
@@ -441,7 +439,6 @@ static void fb_text_render(fb_img *img)
     struct strings_entry *sen;
     struct text_line **lines = NULL;
     char *start, *end;
-    px_type *res_data;
     text_extra *ex = img->extra;
     int8_t *style_map = NULL;
 

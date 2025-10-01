@@ -148,13 +148,16 @@ LOCAL_SRC_FILES := \
     src/truetype/truetype.c \
     src/cff/cff.c \
     src/psnames/psnames.c \
-    src/pshinter/pshinter.c
+    src/pshinter/pshinter.c \
+    src/psaux/psaux.c \
+    src/type1/type1.c \
+    src/cid/type1cid.c
 
-ifeq ($(shell if [ -e "$(ANDROID_BUILD_TOP)/external/freetype/src/gzip/ftgzip.c" ]; then echo "hasgzip"; fi),hasgzip)
+ifeq ($(shell if [ -e "./external/freetype/src/gzip/ftgzip.c" ]; then echo "hasgzip"; fi),hasgzip)
 LOCAL_SRC_FILES += src/gzip/ftgzip.c
 endif
 
-ifeq ($(shell if [ -e "$(ANDROID_BUILD_TOP)/external/freetype/src/base/ftxf86.c" ]; then echo "found"; fi),found)
+ifeq ($(shell if [ -e "./external/freetype/src/base/ftxf86.c" ]; then echo "found"; fi),found)
     LOCAL_SRC_FILES += src/base/ftxf86.c
 else
     LOCAL_SRC_FILES += \
@@ -172,6 +175,8 @@ LOCAL_CFLAGS += -W -Wall
 LOCAL_CFLAGS += -fPIC -DPIC
 LOCAL_CFLAGS += "-DDARWIN_NO_CARBON"
 LOCAL_CFLAGS += "-DFT2_BUILD_LIBRARY"
+# Suppress warnings for unused variables/parameters in FreeType modules
+LOCAL_CFLAGS += -Wno-unused-variable -Wno-unused-parameter
 
 LOCAL_STATIC_LIBRARIES += libpng libz
 

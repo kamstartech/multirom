@@ -334,8 +334,8 @@ void fb_batch_end(void);
 
 void fb_ctx_add_item(void *item);
 void fb_ctx_rm_item(void *item);
-inline void fb_items_lock(void);
-inline void fb_items_unlock(void);
+void fb_items_lock(void);
+void fb_items_unlock(void);
 void fb_set_background(uint32_t color);
 
 px_type *fb_png_get(const char *path, int w, int h);
@@ -343,7 +343,7 @@ void fb_png_release(px_type *data);
 void fb_png_drop_unused(void);
 int fb_png_save_img(const char *path, int w, int h, int stride, px_type *data);
 
-inline void center_text(fb_img *text, int targetX, int targetY, int targetW, int targetH);
+void center_text(fb_img *text, int targetX, int targetY, int targetW, int targetH);
 
 int vt_set_mode(int graphics);
 

@@ -302,7 +302,6 @@ void fixup_sys_perms(const char *upath)
 
 static mode_t get_device_perm(const char *path, unsigned *uid, unsigned *gid)
 {
-    mode_t perm;
     struct listnode *node;
     struct perm_node *perm_node;
     struct perms_ *dp;
@@ -596,15 +595,9 @@ static char **parse_platform_block_device(struct uevent *uevent)
     const char *device;
     struct platform_node *pdev;
     char *slash;
-    int width;
-    char buf[256];
     char link_path[256];
-    int fd;
     int link_num = 0;
-    int ret;
     char *p;
-    unsigned int size;
-    struct stat info;
 
     pdev = find_platform_device(uevent->path);
     if (!pdev)
@@ -900,7 +893,7 @@ out:
     return ret;
 }
 
-static int is_booting(void)
+__attribute__((unused)) static int is_booting(void)
 {
     return access("/dev/.booting", F_OK) == 0;
 }
@@ -909,7 +902,6 @@ static void process_firmware_event(struct uevent *uevent)
 {
     char *root, *loading, *data;
     int l, loading_fd, data_fd, fw_fd, i;
-    int booting = is_booting();
 
     DEBUG("firmware: loading '%s' for '%s'\n",
          uevent->firmware, uevent->path);
@@ -934,8 +926,7 @@ static void process_firmware_event(struct uevent *uevent)
     if(data_fd < 0)
         goto loading_close_out;
 
-try_loading_again:
-    for (i = 0; i < ARRAY_SIZE(firmware_dirs); i++) {
+    for (i = 0; i < (int)ARRAY_SIZE(firmware_dirs); i++) {
         char *file = NULL;
         l = asprintf(&file, "%s/%s", firmware_dirs[i], uevent->firmware);
         if (l == -1)
@@ -984,7 +975,6 @@ root_free_out:
 static void handle_firmware_event(struct uevent *uevent)
 {
     pid_t pid;
-    int ret;
 
     if(strcmp(uevent->subsystem, "firmware"))
         return;

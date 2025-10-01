@@ -95,7 +95,6 @@ static void init_header(multirom_theme_data *t)
 {
     button **tab_btns = t->tab_btns;
     fb_text **tab_texts = t->tab_texts;
-    const int TAB_BTN_WIDTH = fb_width*0.21;
     int i, x;
 #ifdef MR_UNIFIED_TABS
     static const char *str[] = { "ROMS", "MISC" };

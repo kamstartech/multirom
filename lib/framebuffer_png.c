@@ -104,8 +104,7 @@ static px_type *load_png(const char *path, int destW, int destH)
     uint32_t bytes_per_row;
     px_type *data_dest = NULL, *data_itr;
     size_t i, y;
-    int si, alpha;
-    int px_per_row;
+    int si;
     uint32_t src_pix;
     png_bytep *rows = NULL;
 
@@ -200,7 +199,7 @@ static px_type *load_png(const char *path, int destW, int destH)
             ++data_itr;
 #if PIXEL_SIZE == 2
             // Store alpha value for 5 and 6 bit values in next two bytes
-            alpha = ((src_pix & 0xFF000000) >> 24);
+            int alpha = ((src_pix & 0xFF000000) >> 24);
             ((uint8_t*)data_itr)[0] = ((((alpha*100)/0xFF)*31)/100);
             ((uint8_t*)data_itr)[1] = ((((alpha*100)/0xFF)*63)/100);
             ++data_itr;

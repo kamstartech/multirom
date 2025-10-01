@@ -325,7 +325,6 @@ static void *input_thread_work(UNUSED void *cookie)
     pthread_cond_broadcast(&input_start_cond);
     pthread_mutex_unlock(&input_start_mutex);
 
-    int res;
     while(input_run)
     {
         while(ev_get(&ev, 1) == 0)

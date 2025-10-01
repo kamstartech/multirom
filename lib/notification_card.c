@@ -309,7 +309,7 @@ void ncard_set_top_offset(int top_offset)
 
 void ncard_show(ncard_builder *b, int destroy_builder)
 {
-    int i, items_h, btn_x, btn_h, has_btn = 0, it_y = 0, lvl_offset = 0;
+    int i, items_h, btn_x, btn_h, it_y = 0, lvl_offset = 0;
     fb_text *title = 0, *text = 0, *btns[BTN_COUNT];
     int interpolator;
 

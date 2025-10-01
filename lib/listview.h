@@ -81,7 +81,7 @@ void listview_init_ui(listview *view);
 void listview_destroy(listview *view);
 listview_item *listview_add_item(listview *view, int id, void *data);
 void listview_clear(listview *view);
-inline void listview_update_ui(listview *view);
+void listview_update_ui(listview *view);
 void listview_update_ui_args(listview *view, int only_if_moved, int mutex_locked);
 void listview_enable_scroll(listview *view, int enable);
 void listview_update_scroll_mark(listview *view);

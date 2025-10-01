@@ -650,8 +650,6 @@ void fb_draw_rect(fb_rect *r)
     px_type *bits = fb.buffer + (fb.stride*(r->y + min_y)) + r->x + min_x;
 
     int i, x;
-    uint8_t *comps_bits;
-    const uint8_t *comps_clr = (uint8_t*)&color;
     for(i = min_y; i < max_y; ++i)
     {
         if(alpha == 0xFF)
@@ -695,7 +693,6 @@ static inline int blend_png(int value1, int value2, int alpha) {
 void fb_draw_img(fb_img *i)
 {
     int y, x;
-    const int w = i->w*PIXEL_SIZE;
     uint8_t alpha;
     uint8_t *comps_img, *comps_bits;
 
@@ -1012,7 +1009,6 @@ void fb_clear(void)
 
 static void fb_draw(void)
 {
-    uint32_t i;
     fb_item_header *it;
 
     fb_fill(fb_ctx.background_color);
@@ -1053,9 +1049,9 @@ void fb_freeze(int freeze)
     // wait for last draw to finish or prevent new draw
     if(fb_frozen == 1)
     {
-        atomic_int expected = ATOMIC_VAR_INIT(1);
+        int expected = 1;
         pthread_mutex_lock(&fb_draw_mutex);
-        int res = atomic_compare_exchange_strong(&fb_draw_requested, &expected, 0);
+        atomic_compare_exchange_strong(&fb_draw_requested, &expected, 0);
         pthread_mutex_unlock(&fb_draw_mutex);
     }
 }
@@ -1100,18 +1096,14 @@ void *fb_draw_thread_work(UNUSED void *cookie)
     uint32_t diff = 0, prevSleepTime = 0;
     clock_gettime(CLOCK_MONOTONIC, &last);
 
-    atomic_int expected = ATOMIC_VAR_INIT(1);
+    int expected = 1;
 
     while(fb_draw_run)
     {
         clock_gettime(CLOCK_MONOTONIC, &curr);
         diff = timespec_diff(&last, &curr);
 
-#if (PLATFORM_SDK_VERSION >= 25)
-        expected = 1; // might be reseted by atomic_compare_exchange_strong
-#else
-        expected.__val = 1; // might be reseted by atomic_compare_exchange_strong
-#endif
+        expected = 1; // might be reset by atomic_compare_exchange_strong
         pthread_mutex_lock(&fb_draw_mutex);
         if(atomic_compare_exchange_strong(&fb_draw_requested, &expected, 0))
         {
@@ -1146,14 +1138,14 @@ void fb_request_draw(void)
 {
     if(!fb_frozen)
     {
-        atomic_int expected = ATOMIC_VAR_INIT(0);
+        int expected = 0;
         atomic_compare_exchange_strong(&fb_draw_requested, &expected, 1);
     }
 }
 
 void fb_force_draw(void)
 {
-    atomic_int expected = ATOMIC_VAR_INIT(0);
+    int expected = 0;
 
     pthread_mutex_lock(&fb_draw_mutex);
     atomic_compare_exchange_strong(&fb_draw_requested, &expected, 1);
@@ -1213,3 +1205,4 @@ int fb_save_screenshot(void)
         return -1;
     }
 }
+

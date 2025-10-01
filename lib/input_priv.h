@@ -55,7 +55,7 @@ typedef struct
 } handlers_ctx;
 
 void touch_commit_events(struct timeval ev_time);
-inline int calc_mt_pos(int val, int *range, int d_max);
+int calc_mt_pos(int val, int *range, int d_max);
 
 // Implemented in input_touch*.c files
 void handle_abs_event(struct input_event *ev);

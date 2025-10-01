@@ -42,7 +42,7 @@ ifneq ($(MR_DEVICE_VARIANTS),)
 	MR_DEVICES += $(MR_DEVICE_VARIANTS)
 endif
 
-$(MULTIROM_ZIP_TARGET): multirom trampoline signapk bbootimg mrom_kexec_static mrom_adbd $(multirom_extra_dep)
+$(MULTIROM_ZIP_TARGET): multirom trampoline bbootimg mrom_kexec_static mrom_adbd $(multirom_extra_dep)
 	@echo
 	@echo
 	@echo "A crowdfunding campaign for MultiROM took place in 2013. These people got perk 'The Tenth':"
@@ -76,7 +76,7 @@ $(MULTIROM_ZIP_TARGET): multirom trampoline signapk bbootimg mrom_kexec_static m
 				cp -a $(TARGET_OUT_SHARED_LIBRARIES)/$$f $(MULTIROM_INST_DIR)/multirom/enc/; \
 			fi; \
 		done; \
-		if [ -n "$(MR_ENCRYPTION_SETUP_SCRIPT)" ]; then sh "$(ANDROID_BUILD_TOP)/$(MR_ENCRYPTION_SETUP_SCRIPT)" "$(ANDROID_BUILD_TOP)" "$(MULTIROM_INST_DIR)/multirom/enc"; fi; \
+		if [ -n "$(MR_ENCRYPTION_SETUP_SCRIPT)" ]; then sh "./$(MR_ENCRYPTION_SETUP_SCRIPT)" "$(PWD)" "$(MULTIROM_INST_DIR)/multirom/enc"; fi; \
 		\
 		if [ "$(TARGET_IS_64_BIT)" == "true" ]; then \
 			cp -a $(TARGET_OUT_EXECUTABLES)/linker64 $(MULTIROM_INST_DIR)/multirom/enc/; \
@@ -110,7 +110,7 @@ $(MULTIROM_ZIP_TARGET): multirom trampoline signapk bbootimg mrom_kexec_static m
 	@echo Signing flashable zip
 	@rm -f $(MULTIROM_ZIP_TARGET).zip $(MULTIROM_ZIP_TARGET)-unsigned.zip
 	@cd $(MULTIROM_INST_DIR) && zip -qr ../$(notdir $@)-unsigned.zip *
-	@java -Djava.library.path=$(SIGNAPK_JNI_LIBRARY_PATH) -jar $(HOST_OUT_JAVA_LIBRARIES)/signapk.jar --min-sdk-version 26 $(DEFAULT_SYSTEM_DEV_CERTIFICATE).x509.pem $(DEFAULT_SYSTEM_DEV_CERTIFICATE).pk8 $(MULTIROM_ZIP_TARGET)-unsigned.zip $(MULTIROM_ZIP_TARGET).zip
+	@java -jar prebuilts/sdk/tools/linux/lib/apksigner.jar sign --min-sdk-version 21 --key $(DEFAULT_SYSTEM_DEV_CERTIFICATE).pk8 --cert $(DEFAULT_SYSTEM_DEV_CERTIFICATE).x509.pem --out $(MULTIROM_ZIP_TARGET).zip $(MULTIROM_ZIP_TARGET)-unsigned.zip
 	@$(install_zip_path)/rename_zip.sh $(MULTIROM_ZIP_TARGET) $(TARGET_DEVICE) $(PWD)/$(multirom_local_path)/version.h $(MR_DEVICE_SPECIFIC_VERSION)
 	@echo ----- Made MultiROM ZIP installer -------- $@.zip
 
@@ -122,7 +122,7 @@ multirom_zip: $(MULTIROM_ZIP_TARGET)
 MULTIROM_UNINST_TARGET := $(PRODUCT_OUT)/multirom_uninstaller
 MULTIROM_UNINST_DIR := $(PRODUCT_OUT)/multirom_uninstaller
 
-$(MULTIROM_UNINST_TARGET): signapk bbootimg
+$(MULTIROM_UNINST_TARGET): bbootimg
 	@echo ----- Making MultiROM uninstaller ------
 	@rm -rf $(MULTIROM_UNINST_DIR)
 	@mkdir -p $(MULTIROM_UNINST_DIR)
@@ -136,7 +136,7 @@ $(MULTIROM_UNINST_TARGET): signapk bbootimg
 	@echo Signing flashable zip
 	@rm -f $(MULTIROM_UNINST_TARGET).zip $(MULTIROM_UNINST_TARGET)-unsigned.zip
 	@cd $(MULTIROM_UNINST_DIR) && zip -qr ../$(notdir $@)-unsigned.zip *
-	@java -Djava.library.path=$(SIGNAPK_JNI_LIBRARY_PATH) -jar $(HOST_OUT_JAVA_LIBRARIES)/signapk.jar --min-sdk-version 26 $(DEFAULT_SYSTEM_DEV_CERTIFICATE).x509.pem $(DEFAULT_SYSTEM_DEV_CERTIFICATE).pk8 $(MULTIROM_UNINST_TARGET)-unsigned.zip $(MULTIROM_UNINST_TARGET).zip
+	@java -jar prebuilts/sdk/tools/linux/lib/apksigner.jar sign --min-sdk-version 21 --key $(DEFAULT_SYSTEM_DEV_CERTIFICATE).pk8 --cert $(DEFAULT_SYSTEM_DEV_CERTIFICATE).x509.pem --out $(MULTIROM_UNINST_TARGET).zip $(MULTIROM_UNINST_TARGET)-unsigned.zip
 	@echo ----- Made MultiROM uninstaller -------- $@.zip
 
 .PHONY: multirom_uninstaller
@@ -147,7 +147,7 @@ multirom_uninstaller: $(MULTIROM_UNINST_TARGET)
 KERNEL_ZIP_TARGET := $(PRODUCT_OUT)/multirom_kernel
 KERNEL_INST_DIR := $(PRODUCT_OUT)/multirom_kernel_installer
 
-$(KERNEL_ZIP_TARGET): $(PRODUCT_OUT)/kernel kernel_inject signapk
+$(KERNEL_ZIP_TARGET): $(PRODUCT_OUT)/kernel kernel_inject
 	@echo ----- Making MultiROM Kernel ZIP installer ------
 	rm -rf $(KERNEL_INST_DIR)
 	mkdir -p $(KERNEL_INST_DIR)
@@ -160,7 +160,7 @@ $(KERNEL_ZIP_TARGET): $(PRODUCT_OUT)/kernel kernel_inject signapk
 	$(install_zip_path)/make_updater_script.sh "$(MR_DEVICES)" $(KERNEL_INST_DIR)/META-INF/com/google/android "Installing Kernel for"
 	rm -f $(KERNEL_ZIP_TARGET).zip $(KERNEL_ZIP_TARGET)-unsigned.zip
 	cd $(KERNEL_INST_DIR) && zip -qr ../$(notdir $@)-unsigned.zip *
-	java -Djava.library.path=$(SIGNAPK_JNI_LIBRARY_PATH) -jar $(HOST_OUT_JAVA_LIBRARIES)/signapk.jar $(DEFAULT_SYSTEM_DEV_CERTIFICATE).x509.pem $(DEFAULT_SYSTEM_DEV_CERTIFICATE).pk8 $(KERNEL_ZIP_TARGET)-unsigned.zip $(KERNEL_ZIP_TARGET).zip
+	java -jar prebuilts/sdk/tools/linux/lib/apksigner.jar sign --min-sdk-version 21 --key $(DEFAULT_SYSTEM_DEV_CERTIFICATE).pk8 --cert $(DEFAULT_SYSTEM_DEV_CERTIFICATE).x509.pem --out $(KERNEL_ZIP_TARGET).zip $(KERNEL_ZIP_TARGET)-unsigned.zip
 	$(install_zip_path)/rename_zip.sh $(KERNEL_ZIP_TARGET) $(TARGET_DEVICE) $(PWD)/$(multirom_local_path)/version.h
 	@echo ----- Made MultiROM Kernel ZIP installer -------- $@.zip
 
